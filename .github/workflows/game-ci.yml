@@ -9,8 +9,10 @@ jobs:
     env:
       # Prevent cache directory permission issues inside containerized runners.
       HOME: /github/home
-      # Personal license flow: set UNITY_LICENSE only.
+      # Personal license flow for GameCI.
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
     steps:
       # Checkout
       - name: Checkout repository

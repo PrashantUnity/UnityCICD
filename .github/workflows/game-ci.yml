@@ -13,6 +13,9 @@ jobs:
       UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
       UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
       UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+      # Force Personal mode. If a repo/org variable named UNITY_SERIAL exists,
+      # overriding it to empty prevents accidental Pro serial activation.
+      UNITY_SERIAL: ""
     steps:
       # Checkout
       - name: Checkout repository
@@ -43,6 +46,11 @@ jobs:
             echo "For Unity Personal with GameCI, provide UNITY_LICENSE and account credentials."
             exit 1
           fi
+          if [ -n "${UNITY_SERIAL}" ]; then
+            echo "UNITY_SERIAL is set, which triggers Pro serial activation."
+            echo "Remove UNITY_SERIAL from repo/org Variables/Secrets for Unity Personal."
+            exit 1
+          fi
 
       # Test
       - name: Run tests
@@ -51,6 +59,7 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ""
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
@@ -68,6 +77,7 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ""
         with:
           targetPlatform: WebGL
 

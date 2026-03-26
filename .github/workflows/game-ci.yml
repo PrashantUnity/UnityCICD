@@ -1,21 +1,11 @@
 name: Actions 😎
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
     name: Build my project ✨
     runs-on: ubuntu-latest
-    env:
-      # Prevent cache directory permission issues inside containerized runners.
-      HOME: /github/home
-      # Personal license flow for GameCI.
-      UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-      UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-      UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-      # Force Personal mode. If a repo/org variable named UNITY_SERIAL exists,
-      # overriding it to empty prevents accidental Pro serial activation.
-      UNITY_SERIAL: ""
     steps:
       # Checkout
       - name: Checkout repository
@@ -31,27 +21,6 @@ jobs:
           restore-keys: |
             Library-
 
-      # Validate license input early with a clear error.
-      - name: Validate Unity license secret
-        shell: bash
-        run: |
-          if [ -z "${UNITY_LICENSE}" ]; then
-            echo "UNITY_LICENSE is empty or unavailable."
-            echo "For pull_request events from forks, repository secrets are not exposed."
-            echo "Run this workflow on push (or PR from same repo), and ensure UNITY_LICENSE is set."
-            exit 1
-          fi
-          if [ -z "${UNITY_EMAIL}" ] || [ -z "${UNITY_PASSWORD}" ]; then
-            echo "UNITY_EMAIL / UNITY_PASSWORD are empty or unavailable."
-            echo "For Unity Personal with GameCI, provide UNITY_LICENSE and account credentials."
-            exit 1
-          fi
-          if [ -n "${UNITY_SERIAL}" ]; then
-            echo "UNITY_SERIAL is set, which triggers Pro serial activation."
-            echo "Remove UNITY_SERIAL from repo/org Variables/Secrets for Unity Personal."
-            exit 1
-          fi
-
       # Test
       - name: Run tests
         uses: game-ci/unity-test-runner@v4
@@ -59,7 +28,7 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ""
+          HOME: /github/home
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
@@ -77,7 +46,7 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ""
+          HOME: /github/home
         with:
           targetPlatform: WebGL
 
